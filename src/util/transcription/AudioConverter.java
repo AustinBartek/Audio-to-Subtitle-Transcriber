@@ -4,16 +4,12 @@ import java.io.*;
 
 public class AudioConverter {
     public static File convertForSphinx(File input) throws Exception {
-        File output = new File(input.getAbsolutePath() + ".wav");
-        int count = 1;
-        while (output.exists()) {
-            output = new File(input.getAbsolutePath() + count + ".wav");
-            count++;
-        }
+        File output = File.createTempFile("sphinx_", ".wav");
+        output.deleteOnExit();
 
-        ProcessBuilder builder = new ProcessBuilder("ffmpeg", "-i", input.getAbsolutePath(), "-ac", "1", "-ar",
+        ProcessBuilder builder = new ProcessBuilder("ffmpeg", "-y", "-i", input.getAbsolutePath(), "-ac", "1", "-ar",
                 "16000", "-sample_fmt", "s16", output.getAbsolutePath());
-        builder.redirectErrorStream(true);
+        builder.inheritIO();
 
         Process ffmpegProc = builder.start();
         int result = ffmpegProc.waitFor();

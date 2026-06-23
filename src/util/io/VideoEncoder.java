@@ -3,7 +3,9 @@ package util.io;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
@@ -13,9 +15,9 @@ import util.transcription.WordChunkGroup;
 import util.transcription.WordChunker;
 
 public class VideoEncoder {
-    public static void encodeTranscriptionToVideo(File originalFile, WordChunkGroup allWords, RenderSettings settings)
-            throws Exception {
-        File newFile = new File(originalFile.getParent() + File.separator + "output.mov");
+    public static File encodeTranscriptionToVideo(WordChunkGroup allWords, RenderSettings settings) throws Exception {
+        File tempVideoFile = File.createTempFile("render_", ".mov");
+        tempVideoFile.deleteOnExit();
 
         // Format to encode the video and preserve its transparency
         Process process = new ProcessBuilder(
@@ -29,7 +31,7 @@ public class VideoEncoder {
                 "-profile:v", "4444",
                 "-pix_fmt", "yuva444p10le",
                 "-y",
-                newFile.getAbsolutePath())
+                tempVideoFile.getAbsolutePath())
                 .redirectErrorStream(true)
                 .start();
 
@@ -37,9 +39,7 @@ public class VideoEncoder {
 
         // Reading ffmpeg output to ensure no errors
         new Thread(() -> {
-            try (var reader = new java.io.BufferedReader(
-                    new java.io.InputStreamReader(process.getInputStream()))) {
-
+            try (var reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     System.out.println(line);
@@ -64,8 +64,7 @@ public class VideoEncoder {
             renderer.renderFrame(frameNum);
 
             // Converting the image into a byte[] that we can send to ffmpeg
-            int[] pixels = ((DataBufferInt) frame.getRaster()
-                    .getDataBuffer()).getData();
+            int[] pixels = ((DataBufferInt) frame.getRaster().getDataBuffer()).getData();
 
             for (int i = 0; i < pixels.length; i++) {
                 int argb = pixels[i];
@@ -81,5 +80,6 @@ public class VideoEncoder {
 
         g.dispose();
         ffmpegIn.close();
+        return tempVideoFile;
     }
 }

@@ -18,12 +18,15 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.function.Consumer;
 
 import ui.TranscriberWindow;
 
 public class AudioPreviewPanel extends JPanel {
+    TranscriberWindow parent;
     private JPanel audioDisplayPanel;
     private JButton playPauseButton;
     private float[] sampleData;
@@ -32,10 +35,12 @@ public class AudioPreviewPanel extends JPanel {
     private double playheadProgress;
 
     public AudioPreviewPanel(TranscriberWindow parent) {
+        this.parent = parent;
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createLineBorder(Color.cyan));
         sampleData = new float[0];
 
+        // Handles the rendering of waveform and playhead
         audioDisplayPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -85,32 +90,45 @@ public class AudioPreviewPanel extends JPanel {
                 g2d.drawString(dispString, x, y);
             }
         };
+
+        // Click and drag functionality for the audio display panel
+        Consumer<MouseEvent> audioDisplayInteract = (e) -> {
+            if (audioClip == null)
+                return;
+            if (audioClip.isOpen()) {
+                int clickX = e.getX();
+                int width = audioDisplayPanel.getWidth();
+                long totalMicros = audioClip.getMicrosecondLength();
+                long seekPosition = (long) ((clickX / (double) width) * totalMicros);
+
+                boolean wasRunning = audioClip.isRunning();
+                audioClip.stop();
+                audioClip.flush();
+                audioClip.setMicrosecondPosition(seekPosition);
+                if (wasRunning) {
+                    audioClip.start();
+                }
+
+                updatePlayhead();
+                audioDisplayPanel.repaint();
+                updateRenderPreview();
+            }
+        };
+        audioDisplayPanel.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                audioDisplayInteract.accept(e);
+            }
+        });
         audioDisplayPanel.addMouseListener(new MouseAdapter() {
             @Override
-            public void mousePressed(MouseEvent e) {
-                if (audioClip == null)
-                    return;
-                if (audioClip.isOpen()) {
-                    int clickX = e.getX();
-                    int width = audioDisplayPanel.getWidth();
-                    long totalMicros = audioClip.getMicrosecondLength();
-                    long seekPosition = (long) ((clickX / (double) width) * totalMicros);
-
-                    boolean wasRunning = audioClip.isRunning();
-                    audioClip.stop();
-                    audioClip.flush();
-                    audioClip.setMicrosecondPosition(seekPosition);
-                    if (wasRunning) {
-                        audioClip.start();
-                    }
-
-                    updatePlayhead();
-                    audioDisplayPanel.repaint();
-                }
+            public void mouseClicked(MouseEvent e) {
+                audioDisplayInteract.accept(e);
             }
         });
         add(audioDisplayPanel, BorderLayout.CENTER);
 
+        // Play/pause button functionality
         playPauseButton = new JButton("Play");
         playPauseButton.addActionListener((e) -> {
             if (audioClip == null)
@@ -139,6 +157,7 @@ public class AudioPreviewPanel extends JPanel {
             if (audioClip.isRunning()) {
                 updatePlayhead();
                 audioDisplayPanel.repaint();
+                updateRenderPreview();
             }
         });
         drawTimer.start();
@@ -148,6 +167,46 @@ public class AudioPreviewPanel extends JPanel {
         long current = audioClip.getMicrosecondPosition();
         long total = audioClip.getMicrosecondLength();
         playheadProgress = (double) current / total;
+    }
+
+    private void updateRenderPreview() {
+        if (audioClip != null) {
+            int frame = (int) (audioClip.getMicrosecondPosition() / 16666);
+            parent.getRenderPreviewPanel().setFrame(frame);
+        }
+    }
+
+    public void goToStart() {
+        if (audioClip == null)
+            return;
+
+        if (audioClip.isRunning()) {
+            audioClip.stop();
+        }
+        audioClip.setMicrosecondPosition(0);
+        updatePlayhead();
+        audioDisplayPanel.repaint();
+        updateRenderPreview();
+    }
+
+    public void goToEnd() {
+        if (audioClip == null)
+            return;
+
+        if (audioClip.isRunning()) {
+            audioClip.stop();
+        }
+        audioClip.setMicrosecondPosition(audioClip.getMicrosecondLength() - 1);
+        updatePlayhead();
+        audioDisplayPanel.repaint();
+        updateRenderPreview();
+    }
+
+    public void stopAndClose() {
+        if (audioClip != null) {
+            audioClip.stop();
+            audioClip.close();
+        }
     }
 
     public void updateDisplay(File newAudioFile) {

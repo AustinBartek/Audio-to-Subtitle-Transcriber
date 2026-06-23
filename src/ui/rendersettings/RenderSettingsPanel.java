@@ -41,8 +41,8 @@ public class RenderSettingsPanel extends JPanel {
     private JComboBox<TransitionMode> transitionModeSelector;
     private JComboBox<TransitionEasingMode> transitionEasingModeSelector;
     private JComboBox<String> fontSelector;
-    private JSpinner backgroundPadX, backgroundPadY, chunkingValue, transitionLengthValue, outlineSize, fontSize,
-            renderWidth, renderHeight, maxWidthRatio;
+    private JSpinner backgroundPadL, backgroundPadR, backgroundPadU, backgroundPadD, chunkingValue,
+            transitionLengthValue, outlineSize, fontSize, renderWidth, renderHeight, maxWidthRatio;
     private JCheckBox wordsPersist, hideUnspokenWords, roundBackgroundCorners, scaleActiveWord;
     private HashMap<String, Font> fontMap;
 
@@ -66,8 +66,8 @@ public class RenderSettingsPanel extends JPanel {
         renderWidth = new JSpinner(new SpinnerNumberModel(1920, 1, 5000, 1));
         renderHeight = new JSpinner(new SpinnerNumberModel(1080, 1, 5000, 1));
         maxWidthRatio = new JSpinner(new SpinnerNumberModel(0.8, 0.01, 2, 0.01));
-        wordsPersist = new JCheckBox();
-        hideUnspokenWords = new JCheckBox();
+        wordsPersist = new JCheckBox("Persist");
+        hideUnspokenWords = new JCheckBox("Hide");
         outlineSize.setToolTipText("Outline Size");
         renderWidth.setToolTipText("Width of the Render");
         renderHeight.setToolTipText("Height of the Render");
@@ -84,8 +84,8 @@ public class RenderSettingsPanel extends JPanel {
         UIHelper.setMaxAndPreferredSize(renderWidth, new Dimension(50, 50));
         UIHelper.setMaxAndPreferredSize(renderHeight, new Dimension(50, 50));
         UIHelper.setMaxAndPreferredSize(maxWidthRatio, new Dimension(50, 50));
-        UIHelper.setMaxAndPreferredSize(wordsPersist, new Dimension(50, 50));
-        UIHelper.setMaxAndPreferredSize(hideUnspokenWords, new Dimension(50, 50));
+        UIHelper.setMaxAndPreferredSize(wordsPersist, new Dimension(70, 50));
+        UIHelper.setMaxAndPreferredSize(hideUnspokenWords, new Dimension(70, 50));
         JPanel miscSettingsPanel = new JPanel();
         miscSettingsPanel.setLayout(new BorderLayout());
         JPanel miscSettingsList = new JPanel();
@@ -154,21 +154,29 @@ public class RenderSettingsPanel extends JPanel {
         backgroundModeSelector.setSelectedItem(BackgroundMode.NONE);
         backgroundModeSelector.addActionListener((e) -> updateBackgroundSettings());
         UIHelper.setMaxAndPreferredSize(backgroundModeSelector, new Dimension(120, 50));
-        backgroundPadX = new JSpinner(new SpinnerNumberModel(10, 0, 1000, 1));
-        backgroundPadX.setToolTipText("Background Padding X");
-        backgroundPadX.addChangeListener((e) -> updateBackgroundSettings());
-        UIHelper.setMaxAndPreferredSize(backgroundPadX, new Dimension(50, 50));
-        backgroundPadY = new JSpinner(new SpinnerNumberModel(10, 0, 1000, 1));
-        backgroundPadY.setToolTipText("Background Padding Y");
-        backgroundPadY.addChangeListener((e) -> updateBackgroundSettings());
-        UIHelper.setMaxAndPreferredSize(backgroundPadY, new Dimension(50, 50));
-        roundBackgroundCorners = new JCheckBox();
+        backgroundPadL = new JSpinner(new SpinnerNumberModel(10, 0, 1000, 1));
+        backgroundPadL.setToolTipText("Background Padding Left");
+        backgroundPadL.addChangeListener((e) -> updateBackgroundSettings());
+        UIHelper.setMaxAndPreferredSize(backgroundPadL, new Dimension(50, 50));
+        backgroundPadR = new JSpinner(new SpinnerNumberModel(10, 0, 1000, 1));
+        backgroundPadR.setToolTipText("Background Padding Right");
+        backgroundPadR.addChangeListener((e) -> updateBackgroundSettings());
+        UIHelper.setMaxAndPreferredSize(backgroundPadR, new Dimension(50, 50));
+        backgroundPadU = new JSpinner(new SpinnerNumberModel(10, 0, 1000, 1));
+        backgroundPadU.setToolTipText("Background Padding Up");
+        backgroundPadU.addChangeListener((e) -> updateBackgroundSettings());
+        UIHelper.setMaxAndPreferredSize(backgroundPadU, new Dimension(50, 50));
+        backgroundPadD = new JSpinner(new SpinnerNumberModel(10, 0, 1000, 1));
+        backgroundPadD.setToolTipText("Background Padding Down");
+        backgroundPadD.addChangeListener((e) -> updateBackgroundSettings());
+        UIHelper.setMaxAndPreferredSize(backgroundPadD, new Dimension(50, 50));
+        roundBackgroundCorners = new JCheckBox("Round");
         roundBackgroundCorners.setSelected(true);
         roundBackgroundCorners.setToolTipText("Round Background Corners");
         roundBackgroundCorners.addActionListener((e) -> {
             updateBackgroundSettings();
         });
-        UIHelper.setMaxAndPreferredSize(roundBackgroundCorners, new Dimension(50, 50));
+        UIHelper.setMaxAndPreferredSize(roundBackgroundCorners, new Dimension(70, 50));
         JPanel backgroundSettingsPanel = new JPanel();
         backgroundSettingsPanel.setLayout(new BorderLayout());
         JPanel backgroundSettingsList = new JPanel();
@@ -178,8 +186,10 @@ public class RenderSettingsPanel extends JPanel {
         backgroundSettingsPanel.add(backgroundSettingsList);
         backgroundSettingsPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
         backgroundSettingsList.add(backgroundModeSelector);
-        backgroundSettingsList.add(backgroundPadX);
-        backgroundSettingsList.add(backgroundPadY);
+        backgroundSettingsList.add(backgroundPadL);
+        backgroundSettingsList.add(backgroundPadR);
+        backgroundSettingsList.add(backgroundPadU);
+        backgroundSettingsList.add(backgroundPadD);
         backgroundSettingsList.add(roundBackgroundCorners);
         settingsPanel.add(backgroundSettingsPanel);
 
@@ -190,11 +200,11 @@ public class RenderSettingsPanel extends JPanel {
         progressModeSelector.setSelectedItem(ProgressMode.WORD);
         progressModeSelector.addActionListener((e) -> updateProgressSettings());
         UIHelper.setMaxAndPreferredSize(progressModeSelector, new Dimension(120, 50));
-        scaleActiveWord = new JCheckBox();
+        scaleActiveWord = new JCheckBox("Scale");
         scaleActiveWord.setSelected(true);
         scaleActiveWord.setToolTipText("Scale Active Word");
         scaleActiveWord.addActionListener((e) -> updateProgressSettings());
-        UIHelper.setMaxAndPreferredSize(scaleActiveWord, new Dimension(50, 50));
+        UIHelper.setMaxAndPreferredSize(scaleActiveWord, new Dimension(70, 50));
         JPanel progressSettingsPanel = new JPanel();
         progressSettingsPanel.setLayout(new BorderLayout());
         JPanel progressSettingsList = new JPanel();
@@ -323,12 +333,16 @@ public class RenderSettingsPanel extends JPanel {
 
     private void updateBackgroundSettings() {
         BackgroundMode mode = (BackgroundMode) backgroundModeSelector.getSelectedItem();
-        int padX = (Integer) backgroundPadX.getValue();
-        int padY = (Integer) backgroundPadY.getValue();
+        int padL = (Integer) backgroundPadL.getValue();
+        int padR = (Integer) backgroundPadR.getValue();
+        int padU = (Integer) backgroundPadU.getValue();
+        int padD = (Integer) backgroundPadD.getValue();
         boolean roundCorners = roundBackgroundCorners.isSelected();
         parent.getRenderSettings().setWordBackgroundMode(mode);
-        parent.getRenderSettings().setWordBackgroundPaddingX(padX);
-        parent.getRenderSettings().setWordBackgroundPaddingY(padY);
+        parent.getRenderSettings().setBackgroundPaddingLeft(padL);
+        parent.getRenderSettings().setBackgroundPaddingRight(padR);
+        parent.getRenderSettings().setBackgroundPaddingDown(padD);
+        parent.getRenderSettings().setBackgroundPaddingUp(padU);
         parent.getRenderSettings().setRoundBackgroundCorners(roundCorners);
         parent.updateStuff();
     }

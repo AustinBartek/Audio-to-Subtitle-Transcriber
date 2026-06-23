@@ -13,7 +13,7 @@ public class RenderSettings {
     private boolean scaleActiveWord;
     private int transitionAnimationLength;
     private BackgroundMode backgroundMode;
-    private int wordBackgroundPaddingX, wordBackgroundPaddingY;
+    private int backgroundPaddingLeft, backgroundPaddingRight, backgroundPaddingUp, backgroundPaddingDown;
     private boolean roundBackgroundCorners;
     private TransitionMode transitionMode;
     private TransitionEasingMode transitionEasingMode;
@@ -52,16 +52,19 @@ public class RenderSettings {
     }
 
     public RenderSettings(ArrayList<WordColorTheme> themes, int os, ChunkingRules cr, ProgressMode pm, boolean saw,
-            BackgroundMode bm, int wbpx, int wbpy, boolean rbc, TransitionMode tm, TransitionEasingMode tem, int tal,
-            float mwr, Font wf, float wfs, boolean wpis, boolean huw, int rw, int rh) {
+            BackgroundMode bm, int bpl, int bpr, int bpu, int bpd, boolean rbc, TransitionMode tm,
+            TransitionEasingMode tem, int tal, float mwr, Font wf, float wfs, boolean wpis, boolean huw, int rw,
+            int rh) {
         wordColorThemes = themes;
         outlineSize = os;
         chunkingRules = cr;
         progressMode = pm;
         scaleActiveWord = saw;
         backgroundMode = bm;
-        wordBackgroundPaddingX = wbpx;
-        wordBackgroundPaddingY = wbpy;
+        backgroundPaddingLeft = bpl;
+        backgroundPaddingRight = bpr;
+        backgroundPaddingUp = bpu;
+        backgroundPaddingDown = bpd;
         roundBackgroundCorners = rbc;
         transitionMode = tm;
         transitionEasingMode = tem;
@@ -139,20 +142,36 @@ public class RenderSettings {
         backgroundMode = bm;
     }
 
-    public int getWordBackgroundPaddingX() {
-        return wordBackgroundPaddingX;
+    public int getBackgroundPaddingLeft() {
+        return backgroundPaddingLeft;
     }
 
-    public void setWordBackgroundPaddingX(int padX) {
-        wordBackgroundPaddingX = padX;
+    public void setBackgroundPaddingLeft(int bpl) {
+        backgroundPaddingLeft = bpl;
     }
 
-    public int getWordBackgroundPaddingY() {
-        return wordBackgroundPaddingY;
+    public int getBackgroundPaddingRight() {
+        return backgroundPaddingRight;
     }
 
-    public void setWordBackgroundPaddingY(int padY) {
-        wordBackgroundPaddingY = padY;
+    public void setBackgroundPaddingRight(int bpr) {
+        backgroundPaddingRight = bpr;
+    }
+
+    public int getBackgroundPaddingUp() {
+        return backgroundPaddingUp;
+    }
+
+    public void setBackgroundPaddingUp(int bpu) {
+        backgroundPaddingUp = bpu;
+    }
+
+    public int getBackgroundPaddingDown() {
+        return backgroundPaddingDown;
+    }
+
+    public void setBackgroundPaddingDown(int bpd) {
+        backgroundPaddingDown = bpd;
     }
 
     public boolean roundBackgroundCorners() {

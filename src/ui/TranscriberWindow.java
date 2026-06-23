@@ -6,12 +6,23 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
+import javax.swing.AbstractAction;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import ui.audioPreview.AudioPreviewPanel;
 import ui.chunkeditor.ChunkEditorPanel;
@@ -33,26 +44,11 @@ import util.transcription.ChunkingRules;
 import util.transcription.WordChunk;
 import util.transcription.WordChunkGroup;
 
-/*
-What I NEED
-
-top menu bar, for importing audio files and font files
-
-preview panel for the current render settings (includes frame slider to test the visual at different frames)
-
-render settings panel that allows the user to customize the settings for the render (updates the preview)
-
-word chunk editor panel that allows the creation, deletion, and altering of words + timeframes of all current wordchunks (has a button that once pressed, will update the status of the preview panel to match the new words)
-also includes the chunk rule selector that determines how the words are chunked
-
-a pop up menu that allows for adding a new chunk, checks to make sure that it does not occur concurrently with other chunks before adding!
-*/
-
 public class TranscriberWindow extends JFrame {
     private RenderSettings settings;
     private ChunkingRules chunkingRules;
     private WordChunkGroup chunkGroup;
-    private File originalAudioFile;
+    private String saveDirectory;
 
     private TranscriberToolBar toolBar;
     private ChunkEditorPanel chunkEditorPanel;
@@ -66,10 +62,12 @@ public class TranscriberWindow extends JFrame {
         setSize(new Dimension(900, 700));
         setLocationRelativeTo(null);
         setResizable(true);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setIconImage(ImageManager.MEDIA_IMAGE);
 
         // Initializing default information
+        saveDirectory = System.getProperty("user.home") + File.separator + "Downloads";
+
         Font defaultFont = Font.decode(Font.MONOSPACED);
         try {
             InputStream is = TranscriberWindow.class.getResourceAsStream("/res/Roboto-Medium.ttf");
@@ -81,8 +79,8 @@ public class TranscriberWindow extends JFrame {
 
         settings = new RenderSettings(
                 new ArrayList<>(), 6, ChunkingRuleGenerator.generateTimeLimitRules(2.5f), ProgressMode.WORD, true,
-                BackgroundMode.NONE, 30, 15, true, TransitionMode.POP, TransitionEasingMode.COS, 12, 0.5f, defaultFont,
-                70f, false, false, 1920, 1080);
+                BackgroundMode.NONE, 10, 10, 10, 10, true, TransitionMode.POP, TransitionEasingMode.COS, 12, 0.5f,
+                defaultFont, 70f, false, false, 1920, 1080);
 
         chunkGroup = new WordChunkGroup();
         chunkGroup.addChunk(new WordChunk("TESTING", 0, 1000));
@@ -145,6 +143,39 @@ public class TranscriberWindow extends JFrame {
 
         renderSettingsPanel.addFontOption(getRenderSettings().getWordFont());
 
+        // Input map stuff
+        JComponent rootPane = getRootPane();
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                KeyStroke.getKeyStroke(KeyEvent.VK_HOME, KeyEvent.ALT_DOWN_MASK), "pressedHome");
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                KeyStroke.getKeyStroke(KeyEvent.VK_END, KeyEvent.ALT_DOWN_MASK), "pressedEnd");
+
+        rootPane.getActionMap().put("pressedHome", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                audioPreviewPanel.goToStart();
+            }
+        });
+        rootPane.getActionMap().put("pressedEnd", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                audioPreviewPanel.goToEnd();
+            }
+        });
+
+        // Deleting the generated audio files upon closing
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (audioPreviewPanel != null) {
+                    audioPreviewPanel.stopAndClose();
+                }
+                System.gc();
+                System.exit(0);
+            }
+        });
+
+        // Finalize + initial render
         mainPanel.revalidate();
         revalidate();
         repaint();
@@ -176,13 +207,18 @@ public class TranscriberWindow extends JFrame {
         return toolBar;
     }
 
+    public RenderPreviewPanel getRenderPreviewPanel() {
+        return renderPreviewPanel;
+    }
+
     public void tryImportAudio() {
         File audioFile = FileInputter.getUserAudioFileInput();
         if (audioFile == null)
             return;
         try {
-            audioFile = AudioConverter.convertForSphinx(audioFile);
-            WordChunkGroup transcription = AudioTranscriber.transcribeAudio(audioFile);
+            File converted = AudioConverter.convertForSphinx(audioFile);
+            WordChunkGroup transcription = AudioTranscriber.transcribeAudio(converted);
+
             if (chunkGroup != null) {
                 boolean confirm = PopupManager
                         .getConfirmation("Are you sure you would like to overwrite the current transcript?");
@@ -190,9 +226,9 @@ public class TranscriberWindow extends JFrame {
                     return;
             }
             chunkGroup = transcription;
-            originalAudioFile = audioFile;
+            saveDirectory = audioFile.getParent();
 
-            audioPreviewPanel.updateDisplay(audioFile);
+            audioPreviewPanel.updateDisplay(converted);
             chunkEditorPanel.populateItems(chunkGroup);
             updateStuff();
         } catch (Exception e) {
@@ -218,8 +254,27 @@ public class TranscriberWindow extends JFrame {
 
     public void tryRenderVideo() {
         try {
-            VideoEncoder.encodeTranscriptionToVideo(originalAudioFile, chunkGroup, settings);
-            PopupManager.showMessage("Successfully rendered the video!");
+            File tempVideo = VideoEncoder.encodeTranscriptionToVideo(chunkGroup, settings);
+            JFileChooser fileChooser = new JFileChooser(saveDirectory);
+            fileChooser.setDialogTitle("Save Your Rendered Video");
+            fileChooser.setSelectedFile(new File("output.mov"));
+            fileChooser.setFileFilter(new FileNameExtensionFilter("MOV Files", "mov"));
+
+            int userSelection = fileChooser.showSaveDialog(null);
+
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+                File destinationFile = fileChooser.getSelectedFile();
+
+                // Ensure it ends with .mov
+                if (!destinationFile.getName().toLowerCase().endsWith(".mov")) {
+                    destinationFile = new File(destinationFile.getAbsolutePath() + ".mov");
+                }
+
+                Files.move(tempVideo.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                PopupManager.showMessage("Successfully saved render at " + destinationFile.getAbsolutePath());
+            } else {
+                tempVideo.delete();
+            }
         } catch (Exception e) {
             e.printStackTrace();
             PopupManager.showMessage("Error rendering video: " + e.getMessage());

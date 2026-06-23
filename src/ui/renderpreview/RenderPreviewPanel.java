@@ -88,6 +88,14 @@ public class RenderPreviewPanel extends JPanel {
         add(frameSlider);
     }
 
+    public void setFrame(int frame) {
+        int useFrame = Math.min(frame, frameSlider.getMaximum());
+        currentFrame = useFrame;
+        frameSlider.setValue(useFrame);
+        updateFrameLabel();
+        updateRender();
+    }
+
     public void updateRender() {
         renderPanel.repaint();
     }

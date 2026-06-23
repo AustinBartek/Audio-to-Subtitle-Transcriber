@@ -403,7 +403,8 @@ public class ImageRenderer {
         }
 
         public void renderBackground(Graphics2D g) {
-            int padX = settings.getWordBackgroundPaddingX(), padY = settings.getWordBackgroundPaddingY();
+            int padL = settings.getBackgroundPaddingLeft(), padR = settings.getBackgroundPaddingRight(),
+                    padU = settings.getBackgroundPaddingUp(), padD = settings.getBackgroundPaddingDown();
             g.setColor(settings.getTheme(chunk.getThemeIndex()).getBackgroundColor());
 
             FontMetrics fm = g.getFontMetrics();
@@ -418,18 +419,19 @@ public class ImageRenderer {
             double standardizedWidth = visualBounds.getWidth();
 
             if (settings.roundBackgroundCorners()) {
+                int rounding = (int) (settings.getWordFontSize() / 4);
                 g.fill(new RoundRectangle2D.Double(
-                        standardizedX - padX,
-                        standardizedY - padY,
-                        standardizedWidth + padX * 2,
-                        standardizedHeight + padY * 2,
-                        padX, padY));
+                        standardizedX - padL,
+                        standardizedY - padU,
+                        standardizedWidth + padL + padR,
+                        standardizedHeight + padU + padD,
+                        rounding, rounding));
             } else {
                 g.fill(new Rectangle2D.Double(
-                        standardizedX - padX,
-                        standardizedY - padY,
-                        standardizedWidth + padX * 2,
-                        standardizedHeight + padY * 2));
+                        standardizedX - padL,
+                        standardizedY - padU,
+                        standardizedWidth + padL + padR,
+                        standardizedHeight + padU + padD));
             }
         }
     }
