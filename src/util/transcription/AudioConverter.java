@@ -8,7 +8,7 @@ public class AudioConverter {
         output.deleteOnExit();
 
         ProcessBuilder builder = new ProcessBuilder("ffmpeg", "-y", "-i", input.getAbsolutePath(), "-ac", "1", "-ar",
-                "16000", "-sample_fmt", "s16", output.getAbsolutePath());
+                "16000", "-sample_fmt", "s16", output.getAbsolutePath(), "-progress", "pipe:1", "-nostats");
         builder.inheritIO();
 
         Process ffmpegProc = builder.start();

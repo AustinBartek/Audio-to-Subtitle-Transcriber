@@ -101,7 +101,11 @@ public class RenderPreviewPanel extends JPanel {
     }
 
     public void updateSliderMaximum() {
-        frameSlider.setMaximum((int) parent.getChunkGroup().getEndFrame());
+        if (parent.getVideoTime() == -1) {
+            frameSlider.setMaximum((int) (parent.getChunkGroup().getEndFrame()));
+        } else {
+            frameSlider.setMaximum((int) (parent.getVideoTime() * 60));
+        }
         currentFrame = Math.min(currentFrame, frameSlider.getMaximum());
         updateFrameLabel();
     }

@@ -18,7 +18,9 @@ public class TranscriberFileMenu extends JMenu {
         importAudioItem.setAction(new AbstractAction("Import Audio File") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                parent.tryImportAudio();
+                new Thread(() -> {
+                    parent.tryImportAudio();
+                }).start();
             }
         });
 
@@ -26,7 +28,9 @@ public class TranscriberFileMenu extends JMenu {
         importFontItem.setAction(new AbstractAction("Import Font File (ttf)") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                parent.tryImportFont();
+                new Thread(() -> {
+                    parent.tryImportFont();
+                }).start();
             }
         });
 
@@ -34,7 +38,9 @@ public class TranscriberFileMenu extends JMenu {
         renderVideoItem.setAction(new AbstractAction("Render Video") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                parent.tryRenderVideo();
+                new Thread(() -> {
+                    parent.tryRenderVideo();
+                }).start();
             }
         });
 

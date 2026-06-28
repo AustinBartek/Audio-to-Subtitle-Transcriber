@@ -55,6 +55,7 @@ public class TranscriberWindow extends JFrame {
     private RenderSettingsPanel renderSettingsPanel;
     private RenderPreviewPanel renderPreviewPanel;
     private AudioPreviewPanel audioPreviewPanel;
+    private double videoTime;
 
     public TranscriberWindow() {
         super();
@@ -67,6 +68,7 @@ public class TranscriberWindow extends JFrame {
 
         // Initializing default information
         saveDirectory = System.getProperty("user.home") + File.separator + "Downloads";
+        videoTime = -1;
 
         Font defaultFont = Font.decode(Font.MONOSPACED);
         try {
@@ -80,7 +82,7 @@ public class TranscriberWindow extends JFrame {
         settings = new RenderSettings(
                 new ArrayList<>(), 6, ChunkingRuleGenerator.generateTimeLimitRules(2.5f), ProgressMode.WORD, true,
                 BackgroundMode.NONE, 10, 10, 10, 10, true, TransitionMode.POP, TransitionEasingMode.COS, 12, 0.5f,
-                defaultFont, 70f, false, false, 1920, 1080);
+                defaultFont, 70f, false, false, 1280, 720);
 
         chunkGroup = new WordChunkGroup();
         chunkGroup.addChunk(new WordChunk("TESTING", 0, 1000));
@@ -217,6 +219,7 @@ public class TranscriberWindow extends JFrame {
             return;
         try {
             File converted = AudioConverter.convertForSphinx(audioFile);
+            videoTime = AudioTranscriber.getAudioSecondLength(converted);
             WordChunkGroup transcription = AudioTranscriber.transcribeAudio(converted);
 
             if (chunkGroup != null) {
@@ -254,7 +257,10 @@ public class TranscriberWindow extends JFrame {
 
     public void tryRenderVideo() {
         try {
-            File tempVideo = VideoEncoder.encodeTranscriptionToVideo(chunkGroup, settings);
+            if (videoTime == -1) {
+                videoTime = chunkGroup.getChunks().getLast().getEnd() / 1000d;
+            }
+            File tempVideo = VideoEncoder.encodeTranscriptionToVideo(chunkGroup, settings, videoTime);
             JFileChooser fileChooser = new JFileChooser(saveDirectory);
             fileChooser.setDialogTitle("Save Your Rendered Video");
             fileChooser.setSelectedFile(new File("output.mov"));
@@ -279,6 +285,10 @@ public class TranscriberWindow extends JFrame {
             e.printStackTrace();
             PopupManager.showMessage("Error rendering video: " + e.getMessage());
         }
+    }
+
+    public double getVideoTime() {
+        return videoTime;
     }
 
     public void updateStuff() {

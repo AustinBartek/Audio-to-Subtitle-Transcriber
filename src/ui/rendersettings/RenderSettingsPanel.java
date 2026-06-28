@@ -63,8 +63,8 @@ public class RenderSettingsPanel extends JPanel {
         // Misc settings
         miscSettingsLabel = new JLabel("Miscellaneous Settings");
         outlineSize = new JSpinner(new SpinnerNumberModel(6, 0, 200, 1));
-        renderWidth = new JSpinner(new SpinnerNumberModel(1920, 1, 5000, 1));
-        renderHeight = new JSpinner(new SpinnerNumberModel(1080, 1, 5000, 1));
+        renderWidth = new JSpinner(new SpinnerNumberModel(1280, 1, 5000, 1));
+        renderHeight = new JSpinner(new SpinnerNumberModel(720, 1, 5000, 1));
         maxWidthRatio = new JSpinner(new SpinnerNumberModel(0.8, 0.01, 2, 0.01));
         wordsPersist = new JCheckBox("Persist");
         hideUnspokenWords = new JCheckBox("Hide");
