@@ -21,7 +21,7 @@ public class RenderSettings {
     private Font wordFont;
     private float wordFontSize;
     private boolean wordsPersistIfSilent, hideUnspokenWords;
-    private int renderWidth, renderHeight;
+    private int renderWidth, renderHeight, frameRate;
 
     public enum BackgroundMode {
         NONE,
@@ -54,7 +54,7 @@ public class RenderSettings {
     public RenderSettings(ArrayList<WordColorTheme> themes, int os, ChunkingRules cr, ProgressMode pm, boolean saw,
             BackgroundMode bm, int bpl, int bpr, int bpu, int bpd, boolean rbc, TransitionMode tm,
             TransitionEasingMode tem, int tal, float mwr, Font wf, float wfs, boolean wpis, boolean huw, int rw,
-            int rh) {
+            int rh, int fr) {
         wordColorThemes = themes;
         outlineSize = os;
         chunkingRules = cr;
@@ -76,6 +76,7 @@ public class RenderSettings {
         hideUnspokenWords = huw;
         renderWidth = rw;
         renderHeight = rh;
+        frameRate = fr;
     }
 
     public ArrayList<WordColorTheme> getThemes() {
@@ -252,5 +253,13 @@ public class RenderSettings {
 
     public void setRenderHeight(int rh) {
         renderHeight = rh;
+    }
+
+    public int getFrameRate() {
+        return frameRate;
+    }
+
+    public void setFrameRate(int fr) {
+        frameRate = fr;
     }
 }

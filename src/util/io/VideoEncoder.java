@@ -29,7 +29,7 @@ public class VideoEncoder {
                 "-f", "rawvideo",
                 "-pix_fmt", "rgba",
                 "-s", settings.getRenderWidth() + "x" + settings.getRenderHeight(),
-                "-r", "60",
+                "-r", settings.getFrameRate() + "",
                 "-i", "-",
                 "-c:v", "prores_ks",
                 "-profile:v", "4444",
@@ -87,7 +87,7 @@ public class VideoEncoder {
 
         ArrayList<WordChunkGroup> chunked = WordChunker.chunk(allWords, g, settings, width, height);
         // long maxFrame = (chunked.getLast().getEnd() * 60) / 1000;
-        long maxFrame = (long) Math.ceil(videoTime * 60);
+        long maxFrame = (long) Math.ceil(videoTime * settings.getFrameRate());
         ImageRenderer renderer = new ImageRenderer(chunked, settings, g, width, height);
 
         for (long frameNum = 0; frameNum < maxFrame; frameNum++) {

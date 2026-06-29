@@ -31,9 +31,10 @@ public class RenderPreviewPanel extends JPanel {
         this.parent = parent;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createLineBorder(Color.magenta));
+        int frameRate = parent.getRenderSettings().getFrameRate();
 
         currentFrame = 0;
-        frameSlider = new JSlider(JSlider.HORIZONTAL, 0, (int) parent.getChunkGroup().getEndFrame(), 0);
+        frameSlider = new JSlider(JSlider.HORIZONTAL, 0, (int) parent.getChunkGroup().getEndFrame(frameRate), 0);
         frameSlider.addChangeListener((e) -> {
             currentFrame = frameSlider.getValue();
             updateFrameLabel();
@@ -101,10 +102,11 @@ public class RenderPreviewPanel extends JPanel {
     }
 
     public void updateSliderMaximum() {
+        int frameRate = parent.getRenderSettings().getFrameRate();
         if (parent.getVideoTime() == -1) {
-            frameSlider.setMaximum((int) (parent.getChunkGroup().getEndFrame()));
+            frameSlider.setMaximum((int) (parent.getChunkGroup().getEndFrame(frameRate)));
         } else {
-            frameSlider.setMaximum((int) (parent.getVideoTime() * 60));
+            frameSlider.setMaximum((int) (parent.getVideoTime() * frameRate));
         }
         currentFrame = Math.min(currentFrame, frameSlider.getMaximum());
         updateFrameLabel();

@@ -7,8 +7,8 @@ public class AudioConverter {
         File output = File.createTempFile("sphinx_", ".wav");
         output.deleteOnExit();
 
-        ProcessBuilder builder = new ProcessBuilder("ffmpeg", "-y", "-i", input.getAbsolutePath(), "-ac", "1", "-ar",
-                "16000", "-sample_fmt", "s16", output.getAbsolutePath(), "-progress", "pipe:1", "-nostats");
+        ProcessBuilder builder = new ProcessBuilder("ffmpeg", "-vn", "-y", "-i", input.getAbsolutePath(), "-ac", "1",
+                "-ar", "16000", "-sample_fmt", "s16", output.getAbsolutePath(), "-progress", "pipe:1", "-nostats");
         builder.inheritIO();
 
         Process ffmpegProc = builder.start();

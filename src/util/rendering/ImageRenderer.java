@@ -33,6 +33,8 @@ public class ImageRenderer {
         frameHeight = fh;
         displayers = new ArrayList<>();
 
+        int frameRate = settings.getFrameRate();
+
         // Populating displayers
         FontMetrics metrics = g.getFontMetrics();
         ascentHeight = metrics.getAscent();
@@ -86,8 +88,8 @@ public class ImageRenderer {
                 }
             }
 
-            WordChunkGroupDisplayer newGroupDisplayer = new WordChunkGroupDisplayer(group.getStartFrame(),
-                    group.getEndFrame(), newChunkDisplayers);
+            WordChunkGroupDisplayer newGroupDisplayer = new WordChunkGroupDisplayer(group.getStartFrame(frameRate),
+                    group.getEndFrame(frameRate), newChunkDisplayers);
             displayers.add(newGroupDisplayer);
         }
     }
@@ -174,6 +176,7 @@ public class ImageRenderer {
         }
 
         public void renderFrame(long frameNum) {
+            int frameRate = settings.getFrameRate();
             AffineTransform oldTransform = g.getTransform();
 
             // Transition animations ============================================
@@ -236,7 +239,8 @@ public class ImageRenderer {
             switch (settings.getBackgroundMode()) {
                 case ACTIVE:
                     for (WordChunkDisplayer displayer : chunkDisplayers) {
-                        if (frameNum >= displayer.chunk.getStartFrame() && frameNum <= displayer.chunk.getEndFrame()) {
+                        if (frameNum >= displayer.chunk.getStartFrame(frameRate)
+                                && frameNum <= displayer.chunk.getEndFrame(frameRate)) {
                             displayer.renderBackground(g);
                         }
                     }
@@ -256,7 +260,7 @@ public class ImageRenderer {
             ArrayList<WordChunkDisplayer> shouldRender = new ArrayList<>();
             if (settings.hideUnspokenWords()) {
                 for (WordChunkDisplayer displayer : chunkDisplayers) {
-                    if (frameNum >= displayer.chunk.getStartFrame()) {
+                    if (frameNum >= displayer.chunk.getStartFrame(frameRate)) {
                         shouldRender.add(displayer);
                     } else {
                         break;
@@ -270,7 +274,8 @@ public class ImageRenderer {
             WordChunkDisplayer scaledDisplayer = null;
             if (settings.scaleActiveWord()) {
                 for (WordChunkDisplayer displayer : chunkDisplayers) {
-                    if (frameNum >= displayer.chunk.getStartFrame() && frameNum <= displayer.chunk.getEndFrame()) {
+                    if (frameNum >= displayer.chunk.getStartFrame(frameRate)
+                            && frameNum <= displayer.chunk.getEndFrame(frameRate)) {
                         scaledDisplayer = displayer;
                         break;
                     }
@@ -311,13 +316,14 @@ public class ImageRenderer {
                     break;
                 case SLIDER:
                     for (WordChunkDisplayer displayer : shouldRender) {
-                        if (frameNum > displayer.chunk.getEndFrame()) {
+                        if (frameNum > displayer.chunk.getEndFrame(frameRate)) {
                             displayer.renderProgression(g, 1f);
-                        } else if (frameNum >= displayer.chunk.getStartFrame()
-                                && frameNum <= displayer.chunk.getEndFrame()) {
+                        } else if (frameNum >= displayer.chunk.getStartFrame(frameRate)
+                                && frameNum <= displayer.chunk.getEndFrame(frameRate)) {
                             scaleG.accept(displayer, scaledDisplayer);
-                            float progress = (float) (frameNum - displayer.chunk.getStartFrame())
-                                    / (float) (displayer.chunk.getEndFrame() - displayer.chunk.getStartFrame());
+                            float progress = (float) (frameNum - displayer.chunk.getStartFrame(frameRate))
+                                    / (float) (displayer.chunk.getEndFrame(frameRate)
+                                            - displayer.chunk.getStartFrame(frameRate));
                             displayer.renderProgression(g, progress);
                             unscaleG.accept(displayer, scaledDisplayer);
                         }
@@ -325,7 +331,8 @@ public class ImageRenderer {
                     break;
                 case WORD:
                     for (WordChunkDisplayer displayer : shouldRender) {
-                        if (frameNum >= displayer.chunk.getStartFrame() && frameNum <= displayer.chunk.getEndFrame()) {
+                        if (frameNum >= displayer.chunk.getStartFrame(frameRate)
+                                && frameNum <= displayer.chunk.getEndFrame(frameRate)) {
                             scaleG.accept(displayer, scaledDisplayer);
                             displayer.renderProgression(g, 0);
                             unscaleG.accept(displayer, scaledDisplayer);

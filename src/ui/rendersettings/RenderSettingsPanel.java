@@ -42,7 +42,7 @@ public class RenderSettingsPanel extends JPanel {
     private JComboBox<TransitionEasingMode> transitionEasingModeSelector;
     private JComboBox<String> fontSelector;
     private JSpinner backgroundPadL, backgroundPadR, backgroundPadU, backgroundPadD, chunkingValue,
-            transitionLengthValue, outlineSize, fontSize, renderWidth, renderHeight, maxWidthRatio;
+            transitionLengthValue, outlineSize, fontSize, renderWidth, renderHeight, frameRate, maxWidthRatio;
     private JCheckBox wordsPersist, hideUnspokenWords, roundBackgroundCorners, scaleActiveWord;
     private HashMap<String, Font> fontMap;
 
@@ -65,24 +65,28 @@ public class RenderSettingsPanel extends JPanel {
         outlineSize = new JSpinner(new SpinnerNumberModel(6, 0, 200, 1));
         renderWidth = new JSpinner(new SpinnerNumberModel(1280, 1, 5000, 1));
         renderHeight = new JSpinner(new SpinnerNumberModel(720, 1, 5000, 1));
+        frameRate = new JSpinner(new SpinnerNumberModel(30, 1, 200, 1));
         maxWidthRatio = new JSpinner(new SpinnerNumberModel(0.8, 0.01, 2, 0.01));
         wordsPersist = new JCheckBox("Persist");
         hideUnspokenWords = new JCheckBox("Hide");
         outlineSize.setToolTipText("Outline Size");
         renderWidth.setToolTipText("Width of the Render");
         renderHeight.setToolTipText("Height of the Render");
+        frameRate.setToolTipText("Frame Rate");
         maxWidthRatio.setToolTipText("Maximum Text Width/Screen Width Ratio");
         wordsPersist.setToolTipText("Display Words through Silence");
         hideUnspokenWords.setToolTipText("Hide Words that haven't been Spoken");
         outlineSize.addChangeListener((e) -> updateMiscSettings());
         renderWidth.addChangeListener((e) -> updateMiscSettings());
         renderHeight.addChangeListener((e) -> updateMiscSettings());
+        frameRate.addChangeListener((e) -> updateMiscSettings());
         maxWidthRatio.addChangeListener((e) -> updateMiscSettings());
         wordsPersist.addActionListener((e) -> updateMiscSettings());
         hideUnspokenWords.addActionListener((e) -> updateMiscSettings());
         UIHelper.setMaxAndPreferredSize(outlineSize, new Dimension(50, 50));
         UIHelper.setMaxAndPreferredSize(renderWidth, new Dimension(50, 50));
         UIHelper.setMaxAndPreferredSize(renderHeight, new Dimension(50, 50));
+        UIHelper.setMaxAndPreferredSize(frameRate, new Dimension(50, 50));
         UIHelper.setMaxAndPreferredSize(maxWidthRatio, new Dimension(50, 50));
         UIHelper.setMaxAndPreferredSize(wordsPersist, new Dimension(70, 50));
         UIHelper.setMaxAndPreferredSize(hideUnspokenWords, new Dimension(70, 50));
@@ -94,6 +98,7 @@ public class RenderSettingsPanel extends JPanel {
         miscSettingsList.add(outlineSize);
         miscSettingsList.add(renderWidth);
         miscSettingsList.add(renderHeight);
+        miscSettingsList.add(frameRate);
         miscSettingsList.add(maxWidthRatio);
         miscSettingsList.add(wordsPersist);
         miscSettingsList.add(hideUnspokenWords);
@@ -386,12 +391,14 @@ public class RenderSettingsPanel extends JPanel {
         int os = (Integer) outlineSize.getValue();
         int rw = (Integer) renderWidth.getValue();
         int rh = (Integer) renderHeight.getValue();
+        int fr = (Integer) frameRate.getValue();
         float mwr = ((Double) maxWidthRatio.getValue()).floatValue();
         boolean wp = wordsPersist.isSelected();
         boolean hus = hideUnspokenWords.isSelected();
         parent.getRenderSettings().setOutlineSize(os);
         parent.getRenderSettings().setRenderWidth(rw);
         parent.getRenderSettings().setRenderHeight(rh);
+        parent.getRenderSettings().setFrameRate(fr);
         parent.getRenderSettings().setMaxWidthRatio(mwr);
         parent.getRenderSettings().setWordsPersistIfSilentEnabled(wp);
         parent.getRenderSettings().setHideUnspokenWords(hus);

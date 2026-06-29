@@ -171,7 +171,7 @@ public class AudioPreviewPanel extends JPanel {
 
     private void updateRenderPreview() {
         if (audioClip != null) {
-            int frame = (int) (audioClip.getMicrosecondPosition() / 16666);
+            int frame = (int) (audioClip.getMicrosecondPosition() * parent.getRenderSettings().getFrameRate() / 1e6);
             parent.getRenderPreviewPanel().setFrame(frame);
         }
     }

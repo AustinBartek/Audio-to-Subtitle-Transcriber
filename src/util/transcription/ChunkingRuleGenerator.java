@@ -23,7 +23,7 @@ public class ChunkingRuleGenerator {
 
     public static ChunkingRules generateWordCountRules(int maxWords) {
         return (g, nc, graphics, settings, w, h) -> {
-            return g.getNumChunks() == maxWords - 1;
+            return g.getNumChunks() <= maxWords - 1;
         };
     }
 

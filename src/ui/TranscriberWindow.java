@@ -82,7 +82,7 @@ public class TranscriberWindow extends JFrame {
         settings = new RenderSettings(
                 new ArrayList<>(), 6, ChunkingRuleGenerator.generateTimeLimitRules(2.5f), ProgressMode.WORD, true,
                 BackgroundMode.NONE, 10, 10, 10, 10, true, TransitionMode.POP, TransitionEasingMode.COS, 12, 0.5f,
-                defaultFont, 70f, false, false, 1280, 720);
+                defaultFont, 70f, false, false, 1280, 720, 30);
 
         chunkGroup = new WordChunkGroup();
         chunkGroup.addChunk(new WordChunk("TESTING", 0, 1000));

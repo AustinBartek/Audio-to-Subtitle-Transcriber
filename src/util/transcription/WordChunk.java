@@ -21,16 +21,16 @@ public class WordChunk {
         return timeFrame.getStart();
     }
 
-    public long getStartFrame() {
-        return getStart() * 60 / 1000;
+    public long getStartFrame(int frameRate) {
+        return getStart() * frameRate / 1000;
     }
 
     public long getEnd() {
         return timeFrame.getEnd();
     }
 
-    public long getEndFrame() {
-        return getEnd() * 60 / 1000;
+    public long getEndFrame(int frameRate) {
+        return getEnd() * frameRate / 1000;
     }
 
     public long getDuration() {

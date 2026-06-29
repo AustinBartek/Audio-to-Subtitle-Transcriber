@@ -45,10 +45,10 @@ public class WordChunkGroup {
         return min;
     }
 
-    public long getStartFrame() {
+    public long getStartFrame(int frameRate) {
         long min = Long.MAX_VALUE;
         for (WordChunk c : chunks) {
-            min = Math.min(c.getStartFrame(), min);
+            min = Math.min(c.getStartFrame(frameRate), min);
         }
         return min;
     }
@@ -61,10 +61,10 @@ public class WordChunkGroup {
         return max;
     }
 
-    public long getEndFrame() {
+    public long getEndFrame(int frameRate) {
         long max = Long.MIN_VALUE;
         for (WordChunk c : chunks) {
-            max = Math.max(c.getEndFrame(), max);
+            max = Math.max(c.getEndFrame(frameRate), max);
         }
         return max;
     }

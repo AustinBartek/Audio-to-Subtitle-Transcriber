@@ -28,6 +28,7 @@ public class FileInputter {
     }
 
     public static File getUserAudioFileInput() {
-        return getUserFileInput(new FileNameExtensionFilter("Sound Files", "wav", "mp3", "m4a", "ogg"));
+        return getUserFileInput(
+                new FileNameExtensionFilter("Sound Files", "wav", "mp3", "m4a", "ogg", "mp4", "mov", "mkv"));
     }
 }
