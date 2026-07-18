@@ -12,7 +12,7 @@ please make sure you have [ffmpeg](https://ffmpeg.org/) installed and added to y
 
 ## Overview
 
-This project takes in audio files and uses the [Sphinx4 Java Library](https://github.com/cmusphinx/sphinx4) to convert the audio into text blocks. These text blocks are configurable in theme, time of appearance, and grouping. There is a render preview window and audio preview window to assist with the fixing of transcription errors.
+This project takes in audio files and uses the [Vosk Java API](https://github.com/alphacep/vosk-api) to convert the audio into text blocks. These text blocks are configurable in theme, time of appearance, and grouping. There is a render preview window and audio preview window to assist with the fixing of transcription errors.
 
 There are numerous configurable visual aspects of the generator, determining how the text transitions, the font family and size, outlines, backgrounds, and more.
 
